@@ -1,2 +1,2 @@
-## Projetos - DIO - Python ##
-Potência Tech powered by iFood | Ciência de Dados com Python
+## Projetos - DIO  ##
+Repositório de códigos e desafios criados e produzidos nos cursos da DIO.
