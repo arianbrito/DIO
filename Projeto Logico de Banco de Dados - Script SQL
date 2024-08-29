@@ -1,0 +1,142 @@
+-- criação de banco de dados para o cenário de E-commerce
+-- Script de SQL
+
+CREATE database ecommerce;
+
+use ecommerce;
+
+-- criar tabela cliente
+
+CREATE TABLE clients(
+	idClient int auto_increment PRIMARY KEY,
+	Fname varchar(10),
+	Minit char(3),
+	Lname varchar (20),
+	CPF char(11) NOT NULL,
+	Address varchar (30),
+	
+	CONSTRAINT unique_cpf_client UNIQUE (CPF)
+	
+);
+
+ALTER TABLE clients autoincrement =1;
+-- criar tabela produto
+
+CREATE TABLE product(
+	idProduct int auto_increment PRIMARY KEY,
+	Pname varchar(10),
+	classification_kids bool DEFAULT false,
+	category enum('Eletrônico', 'Móveis', 'Vestimenta', 'Brinquestos', 'Alimentos') NOT null,
+	avaliation float DEFAULT 0,
+	size varchar(10)
+	
+);
+
+-- criar tabela de pagamento
+
+CREATE TABLE payments(
+	idClient int,
+	id_payment int,
+	typePayment enum('Boleto', 'Cartão'),
+	limitAvaliable float,
+	PRIMARY KEY (idClient, id_Payment)
+);
+
+
+-- criar tabela pedido
+
+CREATE TABLE orders(
+	idOrders int auto_increment PRIMARY KEY,
+	idOrdersClient int,
+	ordersStatus enum('Cancelado', 'Confirmado', 'Em Processamento') DEFAULT "Em Processamento",
+	ordersDescription varchar (255),
+	sendValue float DEFAULT 10,
+	paymentCash bool DEFAULT FALSE,
+	shippingCost float NOT null,
+	CONSTRAINT fk_orders_cliente FOREIGN KEY (idOrdersClient) REFERENCES clients(idClient)
+		ON UPDATE cascade
+
+);
+
+
+-- criar tabela de estoque
+
+CREATE TABLE productStorage(
+	idProductStorage int auto_increment PRIMARY KEY,
+	storageLocation varchar(255),
+	quantity int DEFAULT 0
+	
+);
+
+
+-- criar tabela de fornecedor
+
+CREATE TABLE supplier(
+	idSupplier int auto_increment PRIMARY KEY,
+	socialName varchar(255) NOT NULL,
+	CNPJ char (15) NOT NULL,
+	contact char(11) NOT NULL,
+	CONSTRAINT unique_supplier UNIQUE (CNPJ)
+);
+
+-- criar tabela vendendor
+
+CREATE TABLE seller(
+	idSeller int auto_increment PRIMARY KEY,
+	socialName varchar(255) NOT NULL,
+	CNPJ char (15),
+	CPF char (9),
+	location varchar (255),
+	contact char(11) NOT NULL,
+	CONSTRAINT unique_cnpj_seller UNIQUE (CNPJ),
+	CONSTRAINT unique_cpf_seller UNIQUE (CPF)
+);
+
+-- criar relação de prodito e vendedor
+
+CREATE TABLE productSeller(
+	idPseller int,
+	idPproduct int,
+	prodQuantity int DEFAULT 1,
+	PRIMARY KEY (idPseller, idPproduct),
+	CONSTRAINT fk_product_seller FOREIGN KEY (idPseller) REFERENCES seller (idSeller),
+	CONSTRAINT fk_product_product FOREIGN KEY (idPproduct) REFERENCES product(idProduct)
+
+);
+
+-- criar relação entre produto e venda
+
+CREATE TABLE productOrder(
+	idPOproduct int,
+	idPOorder int,
+	poQuantity int DEFAULT 1,
+	poStatus enum('Disponível', 'Sem estoque') DEFAULT 'Disponível',
+	PRIMARY KEY (idPOproduct, idPOorder),
+	CONSTRAINT fk_productorder_seller FOREIGN KEY (idPOproduct) REFERENCES product (idProduct),
+	CONSTRAINT fk_productorder_product FOREIGN KEY (idPOorder) REFERENCES orders(idOrders)
+
+);
+
+
+-- criar relação entre estoque e localização
+
+CREATE TABLE storageLocation(
+	idLproduct int,
+	idLstorage int,
+	location varchar (255) NOT NULL,
+	PRIMARY KEY (idLproduct, idLstorage),
+	CONSTRAINT fk_storage_location_seller FOREIGN KEY (idLproduct) REFERENCES product(idProduct),
+	CONSTRAINT fk_storage_location_product FOREIGN KEY (idLstorage) REFERENCES productStorage(idProductStorage)
+);
+
+-- criar relação entre produto e fornecedor
+CREATE TABLE productSupplier(
+	idPsSupplier int,
+	idPsProduct int,
+	quantity int NOT NULL,
+	PRIMARY KEY (idPsSupplier, idPsProduct),
+	CONSTRAINT fk_product_supplier_supplier FOREIGN KEY (idPsSupplier) REFERENCES supplier(idSupplier),
+	CONSTRAINT fk_product_supplier_product FOREIGN KEY (idPsProduct) REFERENCES product(idProduct)
+);
+
+show tables;
